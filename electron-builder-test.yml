@@ -1,0 +1,54 @@
+appId: com.electron.test_app
+productName: vite-electron-temp_test
+directories:
+  buildResources: build
+# files:
+#   - '!**/.vscode/*'
+#   - '!src/*'
+#   - '!electron.vite.config.{js,ts,mjs,cjs}'
+#   - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+#   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+#   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+files:
+  - 'out'
+  - 'resources'
+asarUnpack:
+  - resources/**
+
+win:
+  icon: build/icon-beta.ico
+nsis:
+  artifactName: ${productName}-${version}-setup.${ext} # 安装包名称
+  shortcutName: ${productName} # 快捷方式名称
+  uninstallDisplayName: ${productName} # 控制面板中的卸载程序显示名称
+  createDesktopShortcut: true # 是否创建桌面快捷方式
+  createStartMenuShortcut: true # 是否创建开始菜单快捷方式
+  oneClick: false # 是否一键安装
+  allowToChangeInstallationDirectory: true # 是否允许用户更改安装目录
+  allowElevation: true # 是否允许提升权限
+
+mac:
+  entitlementsInherit: build/entitlements.mac.plist
+  extendInfo:
+    - NSCameraUsageDescription: Application requests access to the device's camera.
+    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
+    - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
+    - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
+  notarize: false
+dmg:
+  artifactName: ${productName}-${version}.${ext}
+
+linux:
+  target:
+    - AppImage
+    - snap
+    - deb
+  maintainer: electronjs.org
+  category: Utility
+appImage:
+  artifactName: ${productName}-${version}.${ext}
+
+npmRebuild: false
+publish:
+  provider: generic
+  url: https://example.com/auto-updates

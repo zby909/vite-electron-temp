@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "target": "ESNext", // 目标 ECMAScript 版本
+    "module": "ESNext", // 模块系统
+    "moduleResolution": "node", // 模块解析策略
+    "strict": true, // 开启严格模式
+    "declaration": true, // 生成声明文件
+    "noImplicitOverride": true, // 禁止隐式的方法覆盖
+    "noUnusedLocals": false, // 检测未使用的局部变量
+    "esModuleInterop": true, // 启用 ES 模块的兼容性导入语法
+    "useUnknownInCatchVariables": false, // 在 catch 子句中禁止使用未知类型
+    "declarationMap": false, // 是否生成声明文件的映射文件
+    "forceConsistentCasingInFileNames": true, // 强制文件名使用一致的大小写
+    "sourceMap": false, // 是否生成 sourceMap 文件
+    "isolatedModules": true, // 禁用整体文件的类型检查
+    "skipLibCheck": true, // 跳过对声明文件的检查
+    "noUnusedParameters": false, // 检测未使用的参数
+    "preserveWatchOutput": true, // 保留输出目录中的编译文件
+    "experimentalDecorators": true, // 启用实验性的装饰器特性
+    "resolveJsonModule": true, // 启用导入 JSON 模块的能力
+    "removeComments": true, // 是否移除注释
+    "noImplicitAny": false, // 允许存在隐式的 any 类型
+    "jsx": "preserve", // JSX 的处理方式
+    "checkJs": false, // 是否检查 JavaScript 文件
+    "allowJs": true, //是否允许编译javascript文件
+    "outDir": "./out",
+    "noImplicitReturns": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/renderer/src/*"], // 路径别名
+      "~/*": ["typings/*"],
+      "~renderer/*": ["src/renderer/typings/*"]
+    }
+  },
+  "files": [],
+  "exclude": ["node_modules", "dist"], // 需要排除的文件夹
+  "references": [{ "path": "./tsconfig.node.json" }, { "path": "./tsconfig.web.json" }]
+}
