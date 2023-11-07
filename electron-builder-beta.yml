@@ -1,14 +1,7 @@
-appId: com.electron.test_app
-productName: vite-electron-temp_test
+appId: com.zby.app_beta
+productName: VITE-ELECTRON-TEMP-BETA
 directories:
   buildResources: build
-# files:
-#   - '!**/.vscode/*'
-#   - '!src/*'
-#   - '!electron.vite.config.{js,ts,mjs,cjs}'
-#   - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
-#   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
-#   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 files:
   - 'out'
   - 'resources'

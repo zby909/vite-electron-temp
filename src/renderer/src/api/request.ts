@@ -3,17 +3,14 @@ import type { RequestType } from '~renderer/request';
 /* 已与后端约定 200的result必有值*/
 import axios from 'axios';
 import Qs from 'qs';
-// import { useAppStoreWithOut } from '@/stores/modules/app';
+import { useAppStore } from '@/stores/modules/app';
 import { ElMessage, ElLoading } from 'element-plus';
-import { baseServiceUrl } from '@/api/insert-global-val';
-console.log(window);
-const osUserInfo: { [key: string]: any } = window.electronNodeAPI.osUserInfo;
-console.log(osUserInfo);
-// const IS_PROD_OR_TEST = ['production', 'test'].includes(import.meta.env.MODE);
+// const osUserInfo: { [key: string]: any } = window.electronNodeAPI.osUserInfo;
+// console.log(osUserInfo);
 console.log(window, import.meta.env);
 
+const appStore = useAppStore();
 const g_showMsg: Array<string | undefined> = []; //记录需要错误提示的接口
-
 const g_showLoadingApiNames: Array<string> = []; //记录需要loading提示的接口 (为了保证需要loading时间最长的那个接口完成后再close)
 let g_showLoadingStatus;
 function toLoading(url: string, msg = 'Loading...', delayLoadingTime = 600) {
@@ -25,11 +22,8 @@ function toLoading(url: string, msg = 'Loading...', delayLoadingTime = 600) {
 }
 
 // 一个axios请求实例
-function createAxios() {
-  const BaseService = axios.create({
-    baseURL: baseServiceUrl, // url = base url + request url
-    timeout: 30 * 1000,
-  });
+function createAxios(baseServiceUrl) {
+  const BaseService = axios.create({ baseURL: baseServiceUrl, timeout: 30 * 1000 });
   console.log('baseServiceUrl: ', baseServiceUrl);
   const requestType = {} as RequestType;
   requestType.getReq = async (url, params = {}, { showMsg = true, loading = false, loadingTxt, delayLoadingTime } = {}) => {
@@ -114,4 +108,4 @@ function createAxios() {
 }
 //----------------------------------下一个服务器请求实例----------------------------------
 
-export const BaseService = createAxios();
+export const BaseService = createAxios(appStore.baseServiceUrl);

@@ -91,6 +91,12 @@
 <script setup lang="ts">
 import homeApi from '@/api/modules/home.api';
 homeApi.ping();
+onBeforeMount(() => {
+  console.log('home.vue onBeforeMount');
+});
+onMounted(() => {
+  console.log('home.vue onMounted');
+});
 </script>
 
 <style scoped lang="scss"></style>

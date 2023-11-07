@@ -15,13 +15,11 @@
     "dev": "electron-vite dev --mode development",
     "build:prod": "npm run typecheck && electron-vite build --mode production",
     "build:beta": "npm run typecheck && electron-vite build --mode beta",
-    "build:test": "npm run typecheck && electron-vite build --mode test",
     "postinstall": "electron-builder install-app-deps",
     "build_prod:win": "npm run build:prod && electron-builder --win --config electron-builder.yml",
     "build_prod:mac": "npm run build:prod && electron-builder --mac --config electron-builder.yml",
     "build_prod:linux": "npm run build:prod && electron-builder --linux --config electron-builder.yml",
-    "build_beta:win": "npm run build:beta && electron-builder --win --config electron-builder-beta.yml",
-    "build_test:win": "npm run build:test && electron-builder --win --config electron-builder-test.yml"
+    "build_beta:win": "npm run build:beta && electron-builder --win --config electron-builder-beta.yml"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^2.0.0",

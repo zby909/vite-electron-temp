@@ -248,6 +248,7 @@ const doCreateNewWindow = async ({ browserWindowOpt, webPreferences = {}, window
       search: query,
     });
   }
+  if (IS_DEV) xWindow.webContents.openDevTools();
   initData && xWindow.webContents.send('initData', initData); //自定义初始化参数
   console.log('准备打开窗口的id', xWindow.id);
   return xWindow.id;

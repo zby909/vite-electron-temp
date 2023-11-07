@@ -48,12 +48,6 @@ beta环境打包 For: pre-master
 $ npm run build_beta:win
 ```
 
-```bash
-测试环境打包 For: 任意分支
-# For windows
-$ npm run build_test:win
-```
-
 ### Tips
 
 若启动项目需要等待 5 次超时才能进入，请尝试打开项目前挂一次梯子即可（不用 vue 调试工具的话就去注释掉 main/index.ts 里面'installExtension'相关的 try catch 代码 就不用等了）。

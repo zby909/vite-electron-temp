@@ -7,8 +7,11 @@
  */
 import { createPinia } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
-
+import initAppStore from '@/api/insert-global-val';
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
-
-export { pinia };
+const usePinia = app => {
+  app.use(pinia);
+  initAppStore();
+};
+export { pinia, usePinia };

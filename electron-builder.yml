@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: vite-electron-temp
+appId: com.zby.app
+productName: VITE-ELECTRON-TEMP
 directories:
   buildResources: build
 # files:

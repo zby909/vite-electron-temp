@@ -7,8 +7,11 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    AddMultipleInput: typeof import('./../src/components/common/AddMultipleInput.vue')['default']
+    ElButton: typeof import('element-plus/es')['ElButton']
+    ElCol: typeof import('element-plus/es')['ElCol']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
+    ElDialog: typeof import('element-plus/es')['ElDialog']
+    ElRow: typeof import('element-plus/es')['ElRow']
     Empty: typeof import('./../src/components/common/Empty/index.vue')['default']
     GLBgIcon: typeof import('./../src/components/common/GLBgIcon.vue')['default']
     GLIcon: typeof import('./../src/components/common/GLIcon.vue')['default']
