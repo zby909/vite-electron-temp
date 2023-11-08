@@ -9,6 +9,7 @@
 import { defineStore } from 'pinia';
 import { pinia } from '@/stores/index';
 import { getLanguage } from '@/lang/index';
+import homeApi from '@/api/modules/home.api';
 
 interface State {
   isMainWin: boolean;
@@ -64,6 +65,9 @@ export const useAppStore = defineStore({
     SET_LANGUAGE(language) {
       this.language = language;
       localStorage.setItem('language', language);
+    },
+    ping() {
+      homeApi.ping();
     },
   },
   persist: {

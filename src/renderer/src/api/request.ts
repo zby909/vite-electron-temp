@@ -7,13 +7,16 @@ import { useAppStore } from '@/stores/modules/app';
 import { ElMessage, ElLoading } from 'element-plus';
 // const osUserInfo: { [key: string]: any } = window.electronNodeAPI.osUserInfo;
 // console.log(osUserInfo);
+import { getParamFormUrl } from '@/api/get-param-fromurl';
+const { baseServiceUrl } = getParamFormUrl();
 console.log(window, import.meta.env);
 
-const appStore = useAppStore();
 const g_showMsg: Array<string | undefined> = []; //记录需要错误提示的接口
 const g_showLoadingApiNames: Array<string> = []; //记录需要loading提示的接口 (为了保证需要loading时间最长的那个接口完成后再close)
 let g_showLoadingStatus;
 function toLoading(url: string, msg = 'Loading...', delayLoadingTime = 600) {
+  const appStore = useAppStore();
+  console.log(appStore.appVersion);
   g_showLoadingApiNames.push(url);
   const g_showLoadingTimer = setTimeout(() => {
     g_showLoadingStatus = ElLoading.service({ lock: true, text: msg, background: 'rgba(0, 0, 0, 0.6)' });
@@ -108,4 +111,4 @@ function createAxios(baseServiceUrl) {
 }
 //----------------------------------下一个服务器请求实例----------------------------------
 
-export const BaseService = createAxios(appStore.baseServiceUrl);
+export const BaseService = createAxios(baseServiceUrl);
