@@ -7,6 +7,7 @@
  * @Reference:
  */
 const Home = () => import('@/views/home/home.vue');
+const Control = () => import('@/views/control/control.vue');
 
 export default [
   {
@@ -18,5 +19,10 @@ export default [
     path: '/home',
     name: 'Home',
     component: Home,
+  },
+  {
+    path: '/control',
+    name: 'Control',
+    component: Control,
   },
 ];

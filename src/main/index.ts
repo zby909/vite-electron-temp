@@ -9,7 +9,7 @@ import type { WebPreferences } from 'electron';
 
 import { app, shell, BrowserWindow, dialog, ipcMain } from 'electron';
 import { optimizer, is } from '@electron-toolkit/utils';
-// import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
+import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 const path = require('path');
 const Store = require('electron-store');
 const store = new Store();
@@ -79,7 +79,7 @@ app.whenReady().then(async () => {
     createWindow();
     // Install Vue Devtools
     try {
-      // await installExtension(VUEJS_DEVTOOLS); // 如果需要安装vue-devtools请打开该行代码
+      await installExtension(VUEJS_DEVTOOLS); // 如果需要安装vue-devtools请打开该行代码
     } catch (e) {
       console.error('Vue Devtools failed to install:', e.toString());
     }
@@ -115,6 +115,7 @@ ipcMain.on('windowIpc', (event, eName = '', { toBrowserWindowId, data = {} } = {
       () => {
         thisBw.webContents.send(eName, data);
         console.log('消息转发到' + toBrowserWindowId + '窗口');
+        event.returnValue = 'success';
       },
       !IS_DEV ? 0 : 500, //开发环境下延迟500毫秒发送消息，避免热更新导致的消息丢失
     );
@@ -125,6 +126,44 @@ ipcMain.on('windowIpc', (event, eName = '', { toBrowserWindowId, data = {} } = {
 ipcMain.on('closeThisWin', (event, { browserWindowId, type = 'close' } = {}) => {
   const thisBw = browserWindowId ? BrowserWindow.fromId(browserWindowId) : null;
   thisBw && (type === 'close' ? thisBw.close() : thisBw.destroy());
+});
+
+//把脚本发送到指定窗口执行，脚本执行完毕后触发doExecuteJavaScriptSuccess事件，可在渲染进程中监听doExecuteJavaScript事件获取执行结果
+const jsHandleEvent = {};
+ipcMain.on('doExecuteJavaScriptSuccess', (event, browserWindowId, { jsRes } = {}) => {
+  jsHandleEvent[browserWindowId] && jsHandleEvent[browserWindowId](jsRes);
+});
+ipcMain.handle('doExecuteJavaScript', async (event, { browserWindowId, script } = {}) => {
+  const thisBw = browserWindowId ? BrowserWindow.fromId(browserWindowId) : null;
+  const res = await new Promise(resolve => {
+    jsHandleEvent[browserWindowId] = res => {
+      resolve(res);
+      delete jsHandleEvent[browserWindowId];
+    };
+    thisBw && thisBw.webContents.executeJavaScript(script);
+  });
+  return res;
+});
+
+const networkHandleEvent = {};
+const startOnloadNetwork = targetWinId => {
+  // const thisBw = BrowserWindow.fromId(targetWinId);
+  // thisBw?.webContents.session.webRequest.onCompleted();
+  setTimeout(() => {
+    networkHandleEvent[targetWinId] && networkHandleEvent[targetWinId]('success');
+  }, 18000);
+};
+ipcMain.handle('networkComplited', async (event, targetWinId, { isReload, jsRes } = {}) => {
+  const networkStatus = await new Promise(resolve => {
+    networkHandleEvent[targetWinId] = res => {
+      resolve(res);
+      //如果涉及到页面reload或者跳转，需要在此才能释放原先记录的【脚本是否执行完毕的promise事件】
+      isReload && jsHandleEvent[targetWinId] && jsHandleEvent[targetWinId](jsRes);
+      delete networkHandleEvent[targetWinId];
+    };
+    startOnloadNetwork(targetWinId);
+  });
+  return networkStatus;
 });
 
 //打开dialog选路径 eName支持的事件 opt配置 browserWindowId父窗口id  https://www.electronjs.org/zh/docs/latest/api/dialog#dialogshowsavedialogbrowserwindow-options
@@ -160,7 +199,7 @@ ipcMain.handle('getChildWindowsId', async (event, browserWindowId) => {
 
 //创建新窗口
 ipcMain.handle('createNewWindow', async (event, opt) => {
-  console.log(event, opt);
+  console.log(event, opt, 'createNewWindow');
   const result = await doCreateNewWindow(opt);
   return result;
 });
@@ -174,7 +213,15 @@ ipcMain.handle('createNewWindow', async (event, opt) => {
  * @param {*} initData - 初始化数据 用ipcRenderer接收
  * @param {Number} serverPort - 该窗口的服务器使用的端口
  */
-const doCreateNewWindow = async ({ browserWindowOpt, webPreferences = {}, windowId, hashRoute = '', serverPort, initData }: any = {}) => {
+const doCreateNewWindow = async ({
+  browserWindowOpt = {},
+  webPreferences = {},
+  windowId,
+  hashRoute = '',
+  serverPort,
+  initData,
+  outUrl,
+}: any = {}) => {
   //如果是希望创建子窗口，需具有parentWinId属性说明是想基于哪个窗口创建子窗口
   if (browserWindowOpt.parentWinId && browserWindowOpt.parentWinId !== -1) {
     browserWindowOpt.parent = BrowserWindow.fromId(Number(browserWindowOpt.parentWinId));
@@ -240,7 +287,7 @@ const doCreateNewWindow = async ({ browserWindowOpt, webPreferences = {}, window
   const query = `?windowId=${windowId}&serverPort=${serverPort}&thisBrowserId=${xWindow.id}&parentWinId=${parentWinId}`;
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     pagePath = (hashRoute ? `${process.env['ELECTRON_RENDERER_URL']}/${hashRoute}` : `${process.env['ELECTRON_RENDERER_URL']}/#/`) + query;
-    await xWindow.loadURL(pagePath);
+    await xWindow.loadURL(outUrl ? outUrl : pagePath);
     console.log('准备打开窗口的路由', pagePath);
   } else {
     await xWindow.loadFile(path.join(__dirname, '../renderer/index.html'), {

@@ -7,100 +7,94 @@
 -->
 <template>
   <div class="home_page">
-    <Versions></Versions>
-
-    <svg class="hero-logo" viewBox="0 0 900 300">
-      <use xlink:href="@/assets/icons.svg#electron" />
-    </svg>
-    <h2 class="hero-text">You've successfully created an Electron project with Vue and TypeScript</h2>
-    <p class="hero-tagline">Please try pressing <code>F12</code> to open the devTool</p>
-
-    <div class="links">
-      <div class="link-item">
-        <a target="_blank" href="https://electron-vite.org">Documentation</a>
-      </div>
-      <div class="link-item link-dot">•</div>
-      <div class="link-item">
-        <a target="_blank" href="https://github.com/alex8088/electron-vite">Getting Help</a>
-      </div>
-      <div class="link-item link-dot">•</div>
-      <div class="link-item">
-        <a target="_blank" href="https://github.com/alex8088/quick-start/tree/master/packages/create-electron"> create-electron </a>
-      </div>
-    </div>
-
-    <div class="features">
-      <div class="feature-item">
-        <article>
-          <h2 class="title">Configuring</h2>
-          <p class="detail">
-            Config with <span>electron.vite.config.ts</span> and refer to the
-            <a target="_blank" href="https://electron-vite.org/config">config guide</a>.
-          </p>
-        </article>
-      </div>
-      <div class="feature-item">
-        <article>
-          <h2 class="title">HMR</h2>
-          <p class="detail">
-            Edit <span>src/renderer</span> files to test HMR. See <a target="_blank" href="https://electron-vite.org/guide/hmr.html">docs</a>.
-          </p>
-        </article>
-      </div>
-      <div class="feature-item">
-        <article>
-          <h2 class="title">Hot Reloading</h2>
-          <p class="detail">
-            Run <span>'electron-vite dev --watch'</span> to enable. See
-            <a target="_blank" href="https://electron-vite.org/guide/hot-reloading.html">docs</a>.
-          </p>
-        </article>
-      </div>
-      <div class="feature-item">
-        <article>
-          <h2 class="title">Debugging</h2>
-          <p class="detail">
-            Check out <span>.vscode/launch.json</span>. See <a target="_blank" href="https://electron-vite.org/guide/debugging.html">docs</a>.
-          </p>
-        </article>
-      </div>
-      <div class="feature-item">
-        <article>
-          <h2 class="title">Source Code Protection</h2>
-          <p class="detail">
-            Supported via built-in plugin <span>bytecodePlugin</span>. See
-            <a target="_blank" href="https://electron-vite.org/guide/source-code-protection.html"> docs </a>
-            .
-          </p>
-        </article>
-      </div>
-      <div class="feature-item">
-        <article>
-          <h2 class="title">Packaging</h2>
-          <p class="detail">
-            Use
-            <a target="_blank" href="https://www.electron.build">electron-builder</a>
-            and pre-configured to pack your app.
-          </p>
-        </article>
-      </div>
-    </div>
+    <button @click="showT">show target win</button>
+    <button @click="startReleaseTask">startReleaseTask</button>
+    <button @click="startCheckTask">startCheckTask</button>
+    <button @click="login">login</button>
   </div>
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { useAppStore } from '@/stores/modules/app';
+import { useWinStore } from '@/stores/modules/win';
 import homeApi from '@/api/modules/home.api';
+import { task1, task2, tasks } from './release/task';
+import * as script from './release/script';
+
 homeApi.ping();
+const appStore = useAppStore();
+const winStore = useWinStore();
+const { thisBrowserId } = storeToRefs(appStore);
 onBeforeMount(() => {
   console.log('home.vue onBeforeMount');
 });
 onMounted(() => {
   console.log('home.vue onMounted');
+  window.electronAPI.ipcRenderer.on('getMsg', (event, v) => {
+    console.log('子窗口x信息:', v.msg);
+  });
 });
+onBeforeUnmount(() => {
+  window.electronAPI.ipcRenderer.removeAllListeners('getMsg');
+  console.log('home.vue onBeforeUnmount');
+});
+// const showC = async () => {
+//   const winId = await window.electronAPI.ipcRenderer.invoke('createNewWindow', {
+//     browserWindowOpt: {
+//       parentWinId: thisBrowserId.value,
+//     },
+//     hashRoute: '#/control',
+//   });
+//   console.log(winId);
+// };
+const showT = async () => {
+  const winId = await window.electronAPI.ipcRenderer.invoke('createNewWindow', {
+    browserWindowOpt: {
+      parentWinId: thisBrowserId.value,
+    },
+    outUrl: 'https://login-innovate.imedidata.com/login',
+  });
+  winStore.UPDATA_TARGETWINID(winId);
+  console.log(winId);
+};
+
+const startReleaseTask = async () => {
+  console.log('startReleaseTask', winStore, script);
+  // script.doTest(task1);
+  for (const task of tasks) {
+    console.log(`%c start task ${task.lineNum}，uuid: ${task.uuid}`, 'color:red;');
+    await script.doTest(task);
+  }
+};
+
+const startCheckTask = async () => {
+  console.log('startCheckTask', winStore, script);
+  script.doTest(task1);
+  // for (const task of tasks) {
+  //   console.log(`start task ${task.lineNum}，uuid: ${task.uuid}`);
+  //   await script.doTest(task);
+  // }
+};
+
+const login = async () => {
+  const res = await window.electronAPI.ipcRenderer.invoke('doExecuteJavaScript', {
+    browserWindowId: winStore.targetWinId,
+    script: `
+    (function(){
+      console.log('login');
+      const u=document.querySelector('[data-testid="username"]')
+      u.value = 'baoyi';
+      const p=document.querySelector('[data-testid="password"]')
+      p.value = 'Da909908..';
+      window.electronAPI.ipcRenderer.send('doExecuteJavaScriptSuccess', ${winStore.targetWinId},'loginsuccess');
+    })()
+  `,
+  });
+  console.log(res);
+};
 </script>
 
 <style scoped lang="scss"></style>
 
-<style lang="scss">
-@import '../../styles/styles.scss';
-</style>
+<style lang="scss"></style>
