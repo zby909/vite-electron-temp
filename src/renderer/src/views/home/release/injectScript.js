@@ -198,35 +198,20 @@ function doInputValueAction({ targetWinId, field, fieldAction, fieldValue } = {}
 /* 执行添加受试者的动作 */
 async function gotoSiteIndex({ targetWinId, pluginWinId } = {}) {
   const eIpc = window.electronAPI.ipcRenderer;
-  let errNum = 0; //跳转到添加受试者页面失败的次数
   const nav = document.querySelector('.nav-primary');
   const allExistedIdUl = nav.querySelector('#app_subjects .dropdown-options');
-  let allIds = [];
-  //如果存在id列表,则代表已经在受试者页面，则获取id列表
+  //如果存在id列表,则代表已经在受试者页面
   if (allExistedIdUl) {
-    allIds = Array.from(allExistedIdUl.querySelectorAll('li')).map(i => i.innerText.trim());
-    console.log(allIds);
     const sitesChoosedEl = nav.querySelector('#study_environment_sites .dropdown-menu')?.querySelector('li.selected a');
-    eIpc.sendSync('windowIpc', 'getMsg', { toBrowserWindowId: pluginWinId, data: { msg: '跳转到添加受试者页面，执行创建Subjects逻辑' } });
+    eIpc.sendSync('windowIpc', 'getMsg', { toBrowserWindowId: pluginWinId, data: { msg: '跳转到主页面，执行创建Subjects逻辑' } });
     await new Promise(resolve => {
       //点击后会刷新页面，会丢失当前页面的dom和注入的js，当前函数后续的代码也不会再执行,所以需要networkComplited的isReload模式来返回当前函数的结果
-      resolve(window.electronAPI.ipcRenderer.invoke('networkComplited', targetWinId, { isReload: true, jsRes: allIds }));
+      resolve(window.electronAPI.ipcRenderer.invoke('networkComplited', targetWinId, { isReload: true, jsRes: true }));
       sitesChoosedEl?.click();
     });
   } else {
-    errNum++;
-    const table = document.querySelector('#subject-table-container');
-    const firstSubject = table.querySelector('tbody tr:first-child');
-    await new Promise(resolve => {
-      resolve(window.electronAPI.ipcRenderer.invoke('networkComplited', targetWinId));
-      firstSubject.querySelector('a')?.click();
-    });
-    if (errNum < 3) {
-      gotoSiteIndex({ targetWinId, pluginWinId });
-    } else {
-      eIpc.sendSync('windowIpc', 'getMsg', { toBrowserWindowId: pluginWinId, data: { msg: '跳转到添加受试者页面失败' } });
-      window.electronAPI.ipcRenderer.send('doExecuteJavaScriptSuccess', targetWinId, { jsRes: [] });
-    }
+    eIpc.sendSync('windowIpc', 'getMsg', { toBrowserWindowId: pluginWinId, data: { msg: '当前已经在主页面，执行创建Subjects逻辑' } });
+    window.electronAPI.ipcRenderer.send('doExecuteJavaScriptSuccess', targetWinId, { jsRes: true });
   }
 }
 async function doNewSubjectAction({ targetWinId, pluginWinId, allSubjectID } = {}) {

@@ -44,10 +44,10 @@ async function doConditions({ field, fieldAction, fieldValue, shouldSave, visit,
   const commonParams = { targetWinId: winStore.targetWinId, pluginWinId: appStore.thisBrowserId };
   if (visit === '/' && form === 'New Subject') {
     //需要至少有一个受试者才能进行添加受试者的操作，用以获取所有的受试者的id
-    const allSubjectID = await sendJavaScriptToPage(gotoSiteIndex, Object.assign({}, commonParams));
-    if (allSubjectID.length) {
+    const gotoSiteIndexSuc = await sendJavaScriptToPage(gotoSiteIndex, Object.assign({}, commonParams));
+    if (gotoSiteIndexSuc) {
       console.log('执行添加受试者的逻辑');
-      await sendJavaScriptToPage(doNewSubjectAction, Object.assign({}, commonParams, { allSubjectID }));
+      await sendJavaScriptToPage(doNewSubjectAction, Object.assign({}, commonParams));
       doStatus = true;
       console.log('已添加受试者');
     }

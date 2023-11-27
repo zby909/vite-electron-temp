@@ -107,7 +107,7 @@ export const task2 = {
   lineNum: '4',
   uuid: 'e817715cc375e3773f6b874d51a1bf55',
   visit: 'Screening',
-  form: 'Admission',
+  form: '准入',
   field: 'Was the subject ADMITTED?',
   type: 'Dynamic Folders',
   testValue: 'Yes',
@@ -194,7 +194,7 @@ export const tasks = [
           fieldType: 'folder',
           fields: ['Screening'],
           subType: 'form',
-          subs: ['Visit Date', 'Informed Consent', 'Demographics', 'Inclusion/Exclusion', 'Admission'],
+          subs: ['Visit Date', 'Informed Consent', 'Demographics', 'Inclusion/Exclusion', '准入'],
           parType: '',
           parent: '',
         },
@@ -213,7 +213,7 @@ export const tasks = [
     lineNum: '4',
     uuid: 'e817715cc375e3773f6b874d51a1bf55',
     visit: 'Screening',
-    form: 'Admission',
+    form: '准入',
     field: 'Was the subject ADMITTED?',
     type: 'Dynamic Folders',
     testValue: 'Yes',
@@ -223,7 +223,7 @@ export const tasks = [
         logic: 'and',
         conditions: [
           {
-            field: 'Was the subject ADMITTED?',
+            field: '受试者是否获准入组？',
             fieldAction: '',
             fieldValue: ['Yes'],
             locations: [
@@ -235,7 +235,7 @@ export const tasks = [
               },
               {
                 adposition: 'on',
-                locateName: 'Admission',
+                locateName: '准入',
                 locateField: 'form',
                 locateType: 'sds',
               },
