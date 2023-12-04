@@ -18,11 +18,14 @@
 import { storeToRefs } from 'pinia';
 import { useAppStore } from '@/stores/modules/app';
 import { useWinStore } from '@/stores/modules/win';
-import homeApi from '@/api/modules/home.api';
+// import homeApi from '@/api/modules/home.api';
 import { task1, task2, tasks } from './release/task';
 import * as script from './release/script';
 
-homeApi.ping();
+import checkTasks from './check/task';
+import * as checkScript from './check/script';
+
+// homeApi.ping();
 const appStore = useAppStore();
 const winStore = useWinStore();
 const { thisBrowserId } = storeToRefs(appStore);
@@ -69,12 +72,11 @@ const startReleaseTask = async () => {
 };
 
 const startCheckTask = async () => {
-  console.log('startCheckTask', winStore, script);
-  script.doTest(task1);
-  // for (const task of tasks) {
-  //   console.log(`start task ${task.lineNum}，uuid: ${task.uuid}`);
-  //   await script.doTest(task);
-  // }
+  console.log('startCheckTask', winStore, checkScript);
+  // checkScript.doTest(task1);
+  for (const task of checkTasks) {
+    await checkScript.doTest(task);
+  }
 };
 
 const login = async () => {

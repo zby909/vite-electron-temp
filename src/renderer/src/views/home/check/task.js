@@ -6,19 +6,19 @@
  * @Reference:
  */
 
-export const tasks = [
+export default [
   {
     beforeActions: [],
     visit: 'D-1',
-    form: 'Eligibility',
+    form: 'Inclusion/Exclusion',
     unitTests: [
       {
-        id: '135',
+        id: '129',
         lineNum: '3',
         cases: [
           {
             id: '',
-            field: 'Was the subject ENROLLED?',
+            field: 'Criterion Type',
             fieldType: 'RadioButton (Vertical)',
             relateFields: [
               {
@@ -26,21 +26,20 @@ export const tasks = [
                 value: 'No',
               },
             ],
-            testValue: 'Yes',
+            testValue: 'Empty',
             testValueIsBlank: true,
-            expectedResult: 'open',
-            queryMessage:
-              'The subject does not meet all inclusion/exclusion criteria; however, "Was the subject ENROLLED?" is "Yes". Please confirm or update as appropriate.',
+            expectedResult: 'Query Opened',
+            queryMessage: '"Does the subject meet all inclusion and exclusion criteria?" is "No", "Criterion Type" is required. Please provide.',
           },
         ],
       },
       {
-        id: '136',
+        id: '130',
         lineNum: '4',
         cases: [
           {
             id: '',
-            field: 'Please specify the reason for screen failure',
+            field: 'Criterion Type',
             fieldType: 'RadioButton (Vertical)',
             relateFields: [
               {
@@ -48,75 +47,54 @@ export const tasks = [
                 value: 'Yes',
               },
             ],
-            testValue: 'Did not meet eligibility criteria',
-            testValueIsBlank: true,
-            expectedResult: 'open',
+            testValue: 'Inclusion',
+            testValueIsBlank: false,
+            expectedResult: 'Query Opened',
             queryMessage:
-              'The subject meets all inclusion/exclusion criteria; however, the screen failure reason is "Did not meet eligibility criteria". Please confirm or update as appropriate.',
+              '"Does the subject meet all inclusion and exclusion criteria?" is "Yes"; however, "Criterion Type" is not blank. Please confirm or update as appropriate.',
           },
         ],
       },
       {
-        id: '137',
+        id: '131',
         lineNum: '5',
         cases: [
           {
             id: '',
-            field: 'Please specify the reason for screen failure',
-            fieldType: 'RadioButton (Vertical)',
+            field: 'Criterion Not Met',
+            fieldType: 'Dynamic SearchList',
             relateFields: [
               {
                 name: 'Does the subject meet all inclusion and exclusion criteria?',
                 value: 'No',
               },
             ],
-            testValue: 'Did not meet eligibility criteria',
+            testValue: 'Empty',
             testValueIsBlank: true,
-            expectedResult: 'open',
-            queryMessage:
-              'The subject does not meet all inclusion/exclusion criteria; however, the screen failure reason is not "Did not meet eligibility criteria". Please confirm or update as appropriate.',
+            expectedResult: 'Query Opened',
+            queryMessage: '"Does the subject meet all inclusion and exclusion criteria?" is "No", "Criterion Not Met" is required. Please provide.',
           },
         ],
       },
       {
-        id: '138',
-        lineNum: '7',
+        id: '132',
+        lineNum: '6',
         cases: [
           {
             id: '',
-            field: 'Please specify the reason for screen failure',
-            fieldType: 'RadioButton (Vertical)',
+            field: 'Criterion Not Met',
+            fieldType: 'Dynamic SearchList',
             relateFields: [
               {
-                name: 'Was the subject ENROLLED?',
+                name: 'Does the subject meet all inclusion and exclusion criteria?',
                 value: 'Yes',
               },
             ],
-            testValue: '',
+            testValue: 'Inclusion 4',
             testValueIsBlank: false,
-            expectedResult: 'open',
-            queryMessage: '"Was the subject ENROLLED?" is "Yes"; however, this field is not blank. Please confirm or update as appropriate.',
-          },
-        ],
-      },
-      {
-        id: '139',
-        lineNum: '8',
-        cases: [
-          {
-            id: '',
-            field: 'Treatment Group',
-            fieldType: 'RadioButton (Vertical)',
-            relateFields: [
-              {
-                name: 'Was the subject ENROLLED?',
-                value: 'No',
-              },
-            ],
-            testValue: '',
-            testValueIsBlank: false,
-            expectedResult: 'open',
-            queryMessage: '"Was the subject ENROLLED?" is "No"; however, this field is not blank. Please confirm or update as appropriate.',
+            expectedResult: 'Query Opened',
+            queryMessage:
+              '"Does the subject meet all inclusion and exclusion criteria?" is "Yes"; however, "Criterion Not Met" is not blank. Please confirm or update as appropriate.',
           },
         ],
       },

@@ -290,10 +290,14 @@ const doCreateNewWindow = async ({
     await xWindow.loadURL(outUrl ? outUrl : pagePath);
     console.log('准备打开窗口的路由', pagePath);
   } else {
-    await xWindow.loadFile(path.join(__dirname, '../renderer/index.html'), {
-      hash: hashRoute,
-      search: query,
-    });
+    if (outUrl) {
+      await xWindow.loadURL(outUrl);
+    } else {
+      await xWindow.loadFile(path.join(__dirname, '../renderer/index.html'), {
+        hash: hashRoute,
+        search: query,
+      });
+    }
   }
   if (IS_DEV) xWindow.webContents.openDevTools();
   initData && xWindow.webContents.send('initData', initData); //自定义初始化参数

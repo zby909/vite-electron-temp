@@ -1,26 +1,5 @@
 const angular = {};
 
-/* 脚本内分离的通用函数 需要提前注入到相应的网页环境当中*/
-// const getInputType = writeDom => {
-//   let inputType = '';
-//   if (writeDom?.classList.contains('radio-button-edit')) {
-//     inputType = 'radio';
-//   } else if (writeDom?.classList.contains('checkbox-container')) {
-//     inputType = 'checkbox';
-//   } else if (writeDom?.classList.contains('long-text')) {
-//     inputType = 'textarea';
-//   } else if (writeDom?.hasAttribute('crf-date-time-write')) {
-//     inputType = 'date';
-//   } else if (writeDom?.classList.contains('dynamic-search-list-edit')) {
-//     inputType = 'dynamic-inputsearch';
-//   } else if (writeDom?.hasAttribute('drop-down-list-write')) {
-//     inputType = 'select';
-//   }
-//   return inputType;
-// };
-/* 脚本内分离的通用函数 */
-
-/* conditions */
 //去到页面
 const goToPage = async ({ targetWinId, pluginWinId, visit, form } = {}) => {
   const eIpc = window.electronAPI.ipcRenderer;
@@ -104,20 +83,20 @@ const goToTablePage = async ({ targetWinId, field, line = 1 } = {}) => {
 
 const save = async ({ targetWinId } = {}) => {
   await new Promise(resolve => {
-    resolve(window.electronAPI.ipcRenderer.invoke('networkComplited', targetWinId, { isReload: true, jsRes: true }));
+    resolve(window.electronAPI.ipcRenderer.invoke('networkComplited', targetWinId));
     document.querySelector('#save-button')?.click();
-    location.reload(); //假设保存成功后会刷新页面，会丢失当前页面的dom和注入的js,所以需要isReload模式来返回当前函数的结果
   });
   window.electronAPI.ipcRenderer.send('doExecuteJavaScriptSuccess', targetWinId, { jsRes: true });
 };
 
 //执行给字段赋值的动作
-function doInputValueAction({ targetWinId, field, fieldAction, fieldValue } = {}) {
+async function doInputValueAction({ targetWinId, field, fieldAction, fieldValue } = {}) {
+  let status = true;
   const targetFieldDom = Array.from(document.querySelectorAll('.question-title-wrapper')).find(i => i.innerText.trim() === field)?.parentElement;
   //点击类名为click-to-edit,进入编辑状态
   targetFieldDom.querySelector('.click-to-edit')?.click();
   // const ENUM_INPUTTYPE = ['radio', 'checkbox', 'textarea', 'date', 'inputsearch', 'dynamic-inputsearch', 'select']; // 普通的inputsearch尚未遇见
-  const writeDom = targetFieldDom.querySelector('.write-control-slot')?.firstElementChild;
+  const writeDom = targetFieldDom.querySelector('.question-content-wrapper .write-control-slot')?.firstElementChild;
   let inputType = '';
   if (writeDom?.classList.contains('radio-button-edit')) {
     inputType = 'radio';
@@ -138,25 +117,44 @@ function doInputValueAction({ targetWinId, field, fieldAction, fieldValue } = {}
   // const radioAttr = ['Criterion Type', 'Was the subject ENROLLED?', 'Sex'];
   // const dateAttr = ['Onset Date', 'Start Date', 'Visit Date'];
   // const checkboxAttr = ['Visit Not Done'];
-
+  if (inputType === 'dynamic-inputsearch') {
+    const clearSelect = writeDom.querySelector('a[aria-label="Select box clear"]');
+    if (fieldValue === 'Empty') {
+      clearSelect?.click();
+    } else {
+      await new Promise(resolve => {
+        resolve(window.electronAPI.ipcRenderer.invoke('networkComplited', targetWinId));
+        targetFieldDom.querySelector('.ui-select-toggle').click();
+      });
+      const ulList = document.querySelector('body>.ui-select-container') || [];
+      //找到对应的.ui-select-choices-row 点击
+      const li = Array.from(ulList.querySelectorAll('.ui-select-choices-row')).find(i => i.innerText.trim() === fieldValue);
+      if (li) {
+        li.click();
+      } else {
+        status = false;
+        console.error('没有找到对应的li', fieldValue);
+      }
+    }
+  }
   if (inputType === 'textarea') {
     //找到targetFieldDom下textarea,判断值是否等于fieldValue[0]
     const textarea = targetFieldDom.querySelector('textarea');
-    const textareaTestValue = textarea.value.trim() === fieldValue[0];
+    const textareaTestValue = textarea.value.trim() === fieldValue;
     //如果textarea不等于fieldValue[0],则将textarea的值设置为fieldValue[0]
     if (!textareaTestValue) {
-      console.log(`修改${field}`, fieldValue[0]);
-      textarea.value = fieldValue[0];
+      console.log(`修改${field}`, fieldValue);
+      textarea.value = fieldValue;
       textarea.dispatchEvent(new Event('input'));
     }
   }
   if (inputType === 'radio') {
     //找到targetFieldDom下所有的type="radio"的input，并判断是否有被选中的且选中的那个input的父元素的innerText是否等于fieldValue[0]
     const allRadio = Array.from(targetFieldDom.querySelectorAll('input[type="radio"]'));
-    const checkedTestValue = allRadio.find(i => i.checked)?.parentElement?.innerText.trim() === fieldValue[0];
-    //如果没有被选中的或者选中的那个input的父元素的innerText不等于fieldValue[0]，则点击innerText等于fieldValue[0]的那个input
-    if (!checkedTestValue) {
-      allRadio.find(i => i.parentElement.innerText.trim() === fieldValue[0])?.click();
+    if (fieldValue === 'Empty') {
+      allRadio.find(i => i.checked)?.click();
+    } else {
+      allRadio.find(i => i.parentElement.innerText.trim() === fieldValue)?.click();
     }
   }
   if (inputType === 'checkbox') {
@@ -170,116 +168,40 @@ function doInputValueAction({ targetWinId, field, fieldAction, fieldValue } = {}
     }
   }
   if (inputType === 'date') {
-    if (fieldValue[0] === 'present') {
+    if (fieldValue === 'present') {
       //转换成"24 May 2013"格式，月份为英文前三字母缩写
       const date = new Date().toLocaleDateString().split('/'); //2023 11 21
       date[2] = date[2].length === 1 ? '0' + date[2] : date[2];
       date[1] = new Date().toLocaleDateString('en', { month: 'short' });
-      fieldValue[0] = `${date[2]} ${date[1]} ${date[0]}`;
+      fieldValue = `${date[2]} ${date[1]} ${date[0]}`;
     }
     const day = targetFieldDom.querySelector('input[placeholder="dd"]');
     const month = targetFieldDom.querySelector('select[ng-model="token.value"]');
     const year = targetFieldDom.querySelector('input[placeholder="yyyy"]');
-    if (`${day.value} ${month.value?.replace('string:', '')} ${year.value}` !== fieldValue[0]) {
-      console.log(`修改${field}`, fieldValue[0]);
-      day.value = fieldValue[0].split(' ')[0];
+    if (`${day.value} ${month.value?.replace('string:', '')} ${year.value}` !== fieldValue) {
+      console.log(`修改${field}`, fieldValue);
+      day.value = fieldValue.split(' ')[0];
       day.dispatchEvent(new Event('input'));
-      month.value = 'string:' + fieldValue[0].split(' ')[1];
+      month.value = 'string:' + fieldValue.split(' ')[1];
       month.dispatchEvent(new Event('change'));
-      year.value = fieldValue[0].split(' ')[2];
+      year.value = fieldValue.split(' ')[2];
       year.dispatchEvent(new Event('input'));
     }
   }
-  window.electronAPI.ipcRenderer.send('doExecuteJavaScriptSuccess', targetWinId, { jsRes: true });
+  window.electronAPI.ipcRenderer.send('doExecuteJavaScriptSuccess', targetWinId, { jsRes: status });
 }
-/* conditions */
 
-/* target */
-//执行字段值对比的动作
-async function doCompareValueAction({ targetWinId, field, fieldValue } = {}) {
+//执行queryMessage对比的动作
+async function doCompareQueryMessageAction({ targetWinId, field, queryMessage } = {}) {
   let doStatus = false;
   //查找title为field的dom
-  const fieldName = field.endsWith('#') ? field + '1' : field;
-  const targetFieldDom = Array.from(document.querySelectorAll('.question-title-wrapper')).find(i => i.innerText.trim() === fieldName)?.parentElement;
-  //点击类名为click-to-edit,进入编辑状态
-  targetFieldDom.querySelector('.click-to-edit')?.click();
-  // const ENUM_INPUTTYPE = ['radio', 'checkbox', 'textarea', 'date', 'inputsearch', 'dynamic-inputsearch', 'select']; // 普通的inputsearch尚未遇见
-  const writeDom = targetFieldDom.querySelector('.write-control-slot')?.firstElementChild;
-  let inputType = '';
-  if (writeDom?.classList.contains('radio-button-edit')) {
-    inputType = 'radio';
-  } else if (writeDom?.classList.contains('checkbox-container')) {
-    inputType = 'checkbox';
-  } else if (writeDom?.classList.contains('long-text')) {
-    inputType = 'textarea';
-  } else if (writeDom?.hasAttribute('crf-date-time-write')) {
-    inputType = 'date';
-  } else if (writeDom?.classList.contains('dynamic-search-list-edit')) {
-    inputType = 'dynamic-inputsearch';
-  } else if (writeDom?.hasAttribute('drop-down-list-write')) {
-    inputType = 'select';
-  }
-  if (inputType === 'dynamic-inputsearch') {
-    //点击targetFieldDom下类名为ui-select-toggle的span
-    await new Promise(resolve => {
-      resolve(window.electronAPI.ipcRenderer.invoke('networkComplited', targetWinId));
-      targetFieldDom.querySelector('.ui-select-toggle').click();
-    });
-    const ulList = document.querySelector('body>.ui-select-container');
-    if (ulList) {
-      //找到类名为ui-select-choices-row的节点，保存其innerText在数组中，去除空值
-      const ulListText = Array.from(ulList.querySelectorAll('.ui-select-choices-row'))
-        .map(i => i.innerText.trim())
-        .filter(i => i);
-      if (ulListText.join(',') === fieldValue.join(',')) {
-        doStatus = true;
-      }
-    }
-  }
-  // const optionsAttr = ['Related Adverse Event#', 'Criterion Not Met'];
-  // if (optionsAttr.includes(field)) {
-  // }
-  window.electronAPI.ipcRenderer.send('doExecuteJavaScriptSuccess', targetWinId, { jsRes: doStatus });
-  return doStatus;
-}
-
-//执行判断visit当中是否存在指定form的动作
-function doVisitFormAction({ targetWinId, visitName, formNames } = {}) {
-  let doStatus = false;
-  const folderTree = angular.element('#mdsolGambitApp').injector().get('foldersTreeService')?.data?.folders || [];
-  const visitInfo = folderTree.find(i => i.name.trim().startsWith(visitName));
-  if (visitInfo) {
-    for (const formName of formNames) {
-      const formInfo = visitInfo?.forms.find(i => i.name.trim() === formName.trim());
-      doStatus = !!formInfo;
-      if (!doStatus) {
-        console.error('targets任务: 不存在该visit下的form', 'visit=', visitName, 'form=', formName);
-        break;
-      }
-    }
-    doStatus && console.log('targets任务: 该visit下的form都存在', 'visit=', visitName, 'form=', formNames.join(','));
-  } else {
-    console.error('targets任务: 不存在该visit', 'visit=', visitName);
+  const targetFieldDom = Array.from(document.querySelectorAll('.question-title-wrapper')).find(i => i.innerText.trim() === field)?.parentElement;
+  const queryMessageDom = targetFieldDom.querySelector('.question-status-markings');
+  const text = queryMessageDom?.querySelector('.mcc-row .content')?.innerText;
+  if (text?.trim() === queryMessage) {
+    doStatus = true;
   }
   window.electronAPI.ipcRenderer.send('doExecuteJavaScriptSuccess', targetWinId, { jsRes: doStatus });
-  return doStatus;
 }
 
-//执行判断是否存在该列的动作
-function doTableColumnAction({ targetWinId, fields } = {}) {
-  let status = true; //fields是否都存在当前页面
-  const questionTitleWrapper = Array.from(document.querySelectorAll('.question-title-wrapper'));
-  for (const field of fields) {
-    const targetFieldDom = questionTitleWrapper.find(i => i.innerText.trim() === field)?.parentElement;
-    if (!targetFieldDom) {
-      status = false;
-      console.error('targets任务: 不存在该列', 'field=', field);
-      break;
-    }
-  }
-  window.electronAPI.ipcRenderer.send('doExecuteJavaScriptSuccess', targetWinId, { jsRes: status });
-  return status;
-}
-/* target */
-
-export { goToPage, goToTablePage, save, doInputValueAction, doCompareValueAction, doVisitFormAction, doTableColumnAction };
+export { goToPage, goToTablePage, save, doInputValueAction, doCompareQueryMessageAction };
