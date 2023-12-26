@@ -1,6 +1,6 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["src/renderer", "typings", "package.json"], // 需要包含的文件或文件夹
+  "include": ["src/renderer/**/*", "typings/**/*", "package.json"], // 需要包含的文件或文件夹
   "compilerOptions": {
     "composite": true,
     "lib": ["ESNext", "DOM", "DOM.Iterable"], // 引入的内置库
