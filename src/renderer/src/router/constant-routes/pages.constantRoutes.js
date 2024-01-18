@@ -8,6 +8,7 @@
  */
 const Home = () => import('@/views/home/home.vue');
 const Control = () => import('@/views/control/control.vue');
+const Testrpa = () => import('@/views/test-rpa/index.vue');
 
 export default [
   {
@@ -24,5 +25,10 @@ export default [
     path: '/control',
     name: 'Control',
     component: Control,
+  },
+  {
+    path: '/testrpa',
+    name: 'Testrpa',
+    component: Testrpa,
   },
 ];

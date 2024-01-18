@@ -128,42 +128,10 @@ ipcMain.on('closeThisWin', (event, { browserWindowId, type = 'close' } = {}) => 
   thisBw && (type === 'close' ? thisBw.close() : thisBw.destroy());
 });
 
-//把脚本发送到指定窗口执行，脚本执行完毕后触发doExecuteJavaScriptSuccess事件，可在渲染进程中监听doExecuteJavaScript事件获取执行结果
-const jsHandleEvent = {};
-ipcMain.on('doExecuteJavaScriptSuccess', (event, browserWindowId, { jsRes } = {}) => {
-  jsHandleEvent[browserWindowId] && jsHandleEvent[browserWindowId](jsRes);
-});
 ipcMain.handle('doExecuteJavaScript', async (event, { browserWindowId, script } = {}) => {
   const thisBw = browserWindowId ? BrowserWindow.fromId(browserWindowId) : null;
-  const res = await new Promise(resolve => {
-    jsHandleEvent[browserWindowId] = res => {
-      resolve(res);
-      delete jsHandleEvent[browserWindowId];
-    };
-    thisBw && thisBw.webContents.executeJavaScript(script);
-  });
-  return res;
-});
-
-const networkHandleEvent = {};
-const startOnloadNetwork = targetWinId => {
-  // const thisBw = BrowserWindow.fromId(targetWinId);
-  // thisBw?.webContents.session.webRequest.onCompleted();
-  setTimeout(() => {
-    networkHandleEvent[targetWinId] && networkHandleEvent[targetWinId]('success');
-  }, 18000);
-};
-ipcMain.handle('networkComplited', async (event, targetWinId, { isReload, jsRes } = {}) => {
-  const networkStatus = await new Promise(resolve => {
-    networkHandleEvent[targetWinId] = res => {
-      resolve(res);
-      //如果涉及到页面reload或者跳转，需要在此才能释放原先记录的【脚本是否执行完毕的promise事件】
-      isReload && jsHandleEvent[targetWinId] && jsHandleEvent[targetWinId](jsRes);
-      delete networkHandleEvent[targetWinId];
-    };
-    startOnloadNetwork(targetWinId);
-  });
-  return networkStatus;
+  thisBw && thisBw.webContents.executeJavaScript(script);
+  return '123';
 });
 
 //打开dialog选路径 eName支持的事件 opt配置 browserWindowId父窗口id  https://www.electronjs.org/zh/docs/latest/api/dialog#dialogshowsavedialogbrowserwindow-options
