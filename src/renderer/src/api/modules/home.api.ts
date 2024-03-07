@@ -6,19 +6,26 @@
  * @LastEditors: zby
  * @Reference:
  */
-import type { RequestFunctionType } from '~renderer/request';
-import { BaseService } from '@/api/request';
+import { defHttp } from '@/api/index';
 
-const postApi = {};
-const getApi = {
+export default {
   /**
    * @description: ping
    */
-  ping(params, config = { loading: true }) {
-    return BaseService.getReq('ping', params, config);
+  ping(params?, config?, options?) {
+    return defHttp.request(
+      {
+        url: '/ping',
+        method: 'GET',
+        params,
+        ...config,
+      },
+      {
+        afHLoading: true,
+        joinTime: true,
+        ...options,
+      },
+    );
   },
   //xxx添加其他方法
 };
-
-const api = Object.assign({}, postApi, getApi) as RequestFunctionType<typeof postApi, 'post'> & RequestFunctionType<typeof getApi, 'get'>;
-export default api;
