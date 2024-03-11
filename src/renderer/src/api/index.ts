@@ -90,15 +90,6 @@ export interface Result<T = any> {
   result: T;
 }
 
-export interface AreaModel {
-  id: string;
-  code: string;
-  parentCode: string;
-  name: string;
-  levelType: number;
-  [key: string]: string | number;
-}
-
 // 创建axios实例一
 export const defHttp = new CreateAxios<Result>({
   baseURL: baseServiceUrl,
