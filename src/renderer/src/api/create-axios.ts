@@ -1,12 +1,13 @@
 /*
  * @Author: zby
  * @Date: 2023-07-12 17:47:50
- * @LastEditTime: 2024-03-07 17:03:05
+ * @LastEditTime: 2024-05-20 15:34:10
  * @LastEditors: zby
  * @Description: 接口请求拦截配置
  */
 
 import axios from 'axios';
+import qs from 'qs';
 
 import type { AxiosRequestConfig, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
@@ -22,15 +23,16 @@ export type CustomConfig = {
 export type CreateAxiosOptions = AxiosRequestConfig & CustomConfig;
 
 export type AxiosCustomOpt = {
+  isUploadFile?: boolean; //是否上传文件
+  supportFormUrlencoded?: boolean; //是否支持www-form-urlencoded格式
+  joinTime?: boolean; //get请求是否加时间戳
+
   afHLoading?: boolean; //是否显示loading
   loadingTxt?: string; //loading提示文字
   delayLoadingTime?: number; //延迟多少毫秒显示loading
-  isUploadFile?: boolean; //是否上传文件
-  isAlertErrorMsg?: boolean; //是否弹出错误提示
-  supportFormUrlencoded?: boolean; //是否支持www-form-urlencoded格式
-  joinTime?: boolean; //get请求是否加时间戳
   withToken?: boolean; //是否携带token
   authenticationScheme?: string; //token的前缀
+  isAlertErrorMsg?: boolean; //是否弹出错误提示
   returnResponseData?: boolean; //是否转换响应数据
 };
 
@@ -79,6 +81,22 @@ export class CreateAxios<R> {
     // Request interceptor
     this.axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig & CustomConfig) => {
       if (requestInterceptors && isFunction(requestInterceptors)) {
+        const { _commonOptions } = config;
+        const { joinTime, isUploadFile, supportFormUrlencoded } = _commonOptions || {};
+        if (supportFormUrlencoded && config.data) {
+          config.data = qs.stringify(config.data);
+        }
+        // get请求加时间戳 防止缓存
+        if (joinTime && config.method === 'get') {
+          config.params = {
+            ...config.params,
+            _t: new Date().getTime(),
+          };
+        }
+        if (isUploadFile && config.headers) {
+          //为了兼容传入的data不是FormData格式的情况，axios检测到请求头是multipart/form-data时会自动转换成FormData格式并append数据
+          config.headers['Content-Type'] = 'multipart/form-data';
+        }
         config = requestInterceptors(config);
       }
       return config;
@@ -108,18 +126,10 @@ export class CreateAxios<R> {
   }
 
   request<T = R>(config: AxiosRequestConfig, options?: AxiosCustomOpt): Promise<T> {
-    const cloneCreateAxiosOptions: CreateAxiosOptions = JSON.parse(JSON.stringify(this.createAxiosOptions));
-    const conf: CreateAxiosOptions = JSON.parse(JSON.stringify(config));
-    const opts: AxiosCustomOpt = options && JSON.parse(JSON.stringify(options));
-    const allConfig: CreateAxiosOptions = Object.assign({}, cloneCreateAxiosOptions, conf);
+    const allConfig: CreateAxiosOptions = Object.assign({}, this.createAxiosOptions, config);
     const { _commonOptions } = allConfig;
-    const allOpt: AxiosCustomOpt = Object.assign({}, _commonOptions, opts);
+    const allOpt: AxiosCustomOpt = Object.assign({}, _commonOptions, options);
     allConfig._commonOptions = allOpt;
-
-    if (config.signal) {
-      allConfig.signal = config.signal;
-    }
-
     return this.axiosInstance.request(allConfig);
   }
 }

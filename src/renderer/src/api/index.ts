@@ -7,7 +7,6 @@
  */
 import { CreateAxios } from './create-axios';
 import type { AxiosTransform, CustomConfig } from './create-axios';
-import qs from 'qs';
 import { ElMessage, ElLoading } from 'element-plus';
 import { getParamFormUrl } from '@/api/get-param-fromurl';
 const { baseServiceUrl } = getParamFormUrl();
@@ -34,7 +33,7 @@ const transformFn: AxiosTransform = {
   //请求之前的拦截器
   requestInterceptors: config => {
     const { _commonOptions } = config;
-    const { withToken, authenticationScheme, joinTime, isUploadFile, supportFormUrlencoded } = _commonOptions || {};
+    const { withToken, authenticationScheme } = _commonOptions || {};
     const { afHLoading, loadingTxt, delayLoadingTime } = _commonOptions || {};
     if (afHLoading) toLoading(loadingTxt, delayLoadingTime);
     // const token = getToken();
@@ -42,20 +41,6 @@ const transformFn: AxiosTransform = {
     if (withToken && token) {
       // jwt token
       config.headers.Authorization = authenticationScheme ? `${authenticationScheme} ${token}` : token;
-    }
-    if (supportFormUrlencoded && config.data) {
-      config.data = qs.stringify(config.data);
-    }
-    // get请求加时间戳 防止缓存
-    if (joinTime && config.method === 'get') {
-      config.params = {
-        ...config.params,
-        _t: new Date().getTime(),
-      };
-    }
-    if (isUploadFile && config.headers) {
-      //为了兼容传入的data不是FormData格式的情况，axios检测到请求头是multipart/form-data时会自动转换成FormData格式并append数据
-      config.headers['Content-Type'] = 'multipart/form-data';
     }
     return config;
   },
