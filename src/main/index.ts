@@ -183,7 +183,7 @@ const doCreateNewWindow = async ({ browserWindowOpt, webPreferences = {}, window
   const initWebPreferences: WebPreferences = {
     webSecurity: true, //同源策略
     preload: path.join(__dirname, '../preload/index.js'),
-    sandbox: false,
+    sandbox: false, //https://cn-evite.netlify.app/guide/dev#%E9%AB%98%E6%95%88
     nodeIntegration: false,
     contextIsolation: true,
   };

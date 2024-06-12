@@ -3,24 +3,17 @@
     "target": "ESNext", // 目标 ECMAScript 版本
     "module": "ESNext", // 模块系统
     "moduleResolution": "Bundler", // 模块解析策略
-    "strict": true,
-    "allowImportingTsExtensions": true,
     "noEmit": true,
-    "declaration": true,
-    "sourceMap": true,
-    "noImplicitOverride": true,
-    "esModuleInterop": true, // 启用 ES 模块的兼容性导入语法
-    "forceConsistentCasingInFileNames": true, // 强制文件名使用一致的大小写
-    "isolatedModules": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "removeComments": true,
     "jsx": "preserve",
+    "strict": true,
+    "noImplicitAny": false,
+    "skipLibCheck": true,
     "checkJs": false,
     "allowJs": true,
-    "noImplicitAny": false,
-    "noImplicitReturns": true,
-    "useUnknownInCatchVariables" :false,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "useUnknownInCatchVariables": false,
     "outDir": "./out",
     "baseUrl": ".",
     "paths": {

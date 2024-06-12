@@ -6,5 +6,4 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"], // 引入的内置库
     "types": ["element-plus/global"] // 需要引入的类型声明
   },
-  "references": []
 }

@@ -5,5 +5,4 @@
     "composite": true,
     "types": ["node","electron-vite/node"]
   },
-  "references": []
 }
