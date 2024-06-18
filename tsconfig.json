@@ -23,5 +23,6 @@
     }
   },
   "exclude": ["node_modules", "dist"], // 需要排除的文件夹
+  "files": [],
   "references": [{ "path": "./tsconfig.node.json" }, { "path": "./tsconfig.web.json" }]
 }
