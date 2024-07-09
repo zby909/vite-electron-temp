@@ -12,25 +12,24 @@ iconClass--自定义类名
 <GLIcon icon="icon-404"  iconClass="hk-header-list-icon"></GLIcon>
 -->
 <template>
-  <svg class="gl-icon" :class="iconClass" aria-hidden="true">
-    <use :xlink:href="'#' + icon"></use>
-  </svg>
+  <span :class="iconClass">
+    <svg class="gl-icon" aria-hidden="true">
+      <use :xlink:href="'#' + icon"></use>
+    </svg>
+  </span>
 </template>
 
-<script>
-export default {
-  name: 'GLIcon',
-  props: {
-    icon: {
-      type: String,
-      require: true,
-    },
-    iconClass: {
-      type: String,
-      default: '',
-    },
+<script lang="ts" setup>
+defineProps({
+  icon: {
+    type: String,
+    require: true,
   },
-};
+  iconClass: {
+    type: String,
+    default: '',
+  },
+});
 </script>
 
 <style scoped>
