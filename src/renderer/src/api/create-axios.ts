@@ -1,7 +1,7 @@
 /*
  * @Author: zby
  * @Date: 2023-07-12 17:47:50
- * @LastEditTime: 2024-05-20 15:34:10
+ * @LastEditTime: 2024-07-18 13:34:54
  * @LastEditors: zby
  * @Description: 接口请求拦截配置
  */
@@ -58,7 +58,7 @@ export abstract class AxiosTransform {
   responseInterceptorsCatch?: (error) => Promise<never>;
 }
 
-export class CreateAxios<R> {
+export class CreateAxios<R = any> {
   private axiosInstance: AxiosInstance;
   private readonly createAxiosOptions: CreateAxiosOptions;
 

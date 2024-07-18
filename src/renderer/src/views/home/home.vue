@@ -90,7 +90,9 @@
 
 <script setup lang="ts">
 import homeApi from '@/api/modules/home.api';
-homeApi.ping({ name: 'zby' });
+homeApi.ping({ name: 'zby' }).then(res => {
+  console.log(res.data);
+});
 onBeforeMount(() => {
   console.log('home.vue onBeforeMount');
 });
