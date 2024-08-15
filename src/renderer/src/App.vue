@@ -19,10 +19,7 @@ console.log('app.vue');
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs';
 import en from 'element-plus/dist/locale/en.mjs';
 import { useAppStore } from '@/stores/modules/app';
-import homeApi from '@/api/modules/home.api';
-homeApi.ping();
 const appStore = useAppStore();
-appStore.ping();
 
 const IS_PROD = ['production'].includes(import.meta.env.MODE);
 const IS_BETA = ['beta'].includes(import.meta.env.MODE);

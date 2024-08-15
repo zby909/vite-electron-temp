@@ -90,9 +90,13 @@
 
 <script setup lang="ts">
 import homeApi from '@/api/modules/home.api';
-homeApi.ping({ name: 'zby' }).then(res => {
-  console.log(res.data);
+const abort = new AbortController();
+homeApi.ping({ name: 'zby' }, { signal: abort.signal }).then(res => {
+  console.log(res.result);
 });
+setTimeout(() => {
+  abort.abort();
+}, 2000);
 onBeforeMount(() => {
   console.log('home.vue onBeforeMount');
 });

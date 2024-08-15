@@ -7,13 +7,14 @@
  * @Reference:
  */
 import { defHttp } from '@/api/index';
+import type { Result } from '@/api/index';
 
 export default {
   /**
    * @description: ping
    */
   ping(params?, config?, options?) {
-    return defHttp.request(
+    return defHttp.request<Result<{ abc: string }>>(
       {
         url: '/ping',
         method: 'GET',
