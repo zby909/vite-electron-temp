@@ -7,7 +7,7 @@
  * @Reference:
  */
 const Home = () => import('@/views/home/home.vue');
-const Control = () => import('@/views/control/control.vue');
+// const Control = () => import('@/views/control/control.vue');
 const Testrpa = () => import('@/views/test-rpa/index.vue');
 
 export default [
@@ -21,14 +21,22 @@ export default [
     name: 'Home',
     component: Home,
   },
-  {
-    path: '/control',
-    name: 'Control',
-    component: Control,
-  },
+  // {
+  //   path: '/control',
+  //   name: 'Control',
+  //   component: Control,
+  // },
   {
     path: '/testrpa',
     name: 'Testrpa',
     component: Testrpa,
+  },
+
+  //
+
+  {
+    path: '/puppeteerWin',
+    name: 'PuppeteerWin',
+    component: () => import('@/views/test-rpa/puppeteerWin.vue'),
   },
 ];

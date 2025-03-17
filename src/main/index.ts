@@ -1,3 +1,4 @@
+/* eslint-disable no-inner-declarations */
 /*
  * @Description:
  * @Author: zby
@@ -7,17 +8,17 @@
  */
 import type { WebPreferences } from 'electron';
 
-import { app, shell, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, shell, BrowserWindow, ipcMain } from 'electron';
 import { optimizer, is } from '@electron-toolkit/utils';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 const path = require('path');
-const Store = require('electron-store');
-const store = new Store();
 import icon from '../../resources/icon.png?asset';
 import generateUUID from '@/utils/guid.js';
 import { tryUsePort } from './utils/generate-port';
 const IS_DEV = ['development'].includes(import.meta.env.MODE);
 // console.log(import.meta.env);
+import onEvent from './event/index';
+app.commandLine.appendSwitch('remote-debugging-port', '9228');
 
 const setUniqueness = () => {
   const IS_PROD = ['production'].includes(import.meta.env.MODE);
@@ -42,7 +43,7 @@ if (!gotTheLock) {
 }
 
 //创建新的主窗口
-async function createWindow(serverPort = '', envParamArr: Array<string> = []) {
+async function createWindow(serverPort?, envParamArr: Array<string> = []) {
   const options = {
     browserWindowOpt: {
       // titleBarStyle: 'hidden',
@@ -84,85 +85,6 @@ app.whenReady().then(async () => {
       console.error('Vue Devtools failed to install:', e.toString());
     }
   }
-});
-
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
-
-/* start  -- 自定义渲染进程和主进程的一些通信函数 -- */
-/* start  -- 自定义渲染进程和主进程的一些通信函数 -- */
-/* start  -- 自定义渲染进程和主进程的一些通信函数 -- */
-ipcMain.on('setStore', (_, key, value) => {
-  store.set(key, value);
-});
-
-ipcMain.on('getStore', (_, key) => {
-  const value = store.get(key);
-  _.returnValue = value || '';
-});
-
-//窗口通信中转 eName自定义事件名称 toBrowserWindowId要发送到的窗口id data发送的数据
-ipcMain.on('windowIpc', (event, eName = '', { toBrowserWindowId, data = {} } = {}) => {
-  const thisBw = toBrowserWindowId ? BrowserWindow.fromId(toBrowserWindowId) : null;
-  if (thisBw) {
-    setTimeout(
-      () => {
-        thisBw.webContents.send(eName, data);
-        console.log('消息转发到' + toBrowserWindowId + '窗口');
-        event.returnValue = 'success';
-      },
-      !IS_DEV ? 0 : 500, //开发环境下延迟500毫秒发送消息，避免热更新导致的消息丢失
-    );
-  }
-});
-
-//关闭窗口 browserWindowId需要关闭的窗口id type关闭模式close普通关闭destroy强制关闭（区别请查阅文档）
-ipcMain.on('closeThisWin', (event, { browserWindowId, type = 'close' } = {}) => {
-  const thisBw = browserWindowId ? BrowserWindow.fromId(browserWindowId) : null;
-  thisBw && (type === 'close' ? thisBw.close() : thisBw.destroy());
-});
-
-ipcMain.handle('doExecuteJavaScript', async (event, { browserWindowId, script } = {}) => {
-  const thisBw = browserWindowId ? BrowserWindow.fromId(browserWindowId) : null;
-  thisBw && thisBw.webContents.executeJavaScript(script);
-  return '123';
-});
-
-//打开dialog选路径 eName支持的事件 opt配置 browserWindowId父窗口id  https://www.electronjs.org/zh/docs/latest/api/dialog#dialogshowsavedialogbrowserwindow-options
-ipcMain.handle('ipcDialog', async (event, eName, opt, browserWindowId = null) => {
-  let result;
-  const thisBw = browserWindowId ? BrowserWindow.fromId(browserWindowId) : null;
-  if (thisBw) result = await dialog[eName](thisBw, opt);
-  if (!thisBw) result = await dialog[eName](opt);
-  return result;
-});
-
-//调用窗口的原生方法 browserWindowId需要调用方法的窗口id, attr调用的属性, type: call为方法 get为获取 ;如 thisBw.maximize() thisBw.id
-//不支持返回环类循环引用类型 如获取的BrowserWindow对象不能直接返回，所以getChildWindows()方法获取的窗口组就需自定义特殊处理
-ipcMain.handle('callNativeMethodOfWindow', async (event, { browserWindowId, attr, type = 'call' } = {}) => {
-  let result = null;
-  const thisBw = browserWindowId ? BrowserWindow.fromId(browserWindowId) : null;
-  if (thisBw && attr) {
-    type === 'call' && (result = thisBw[attr]());
-    type === 'get' && (result = thisBw[attr]);
-  }
-  // if (Object.prototype.toString.call(result) === '[object Object]' || Array.isArray(result)) {
-  //   result = JSON.stringify(result);
-  // }
-  return result;
-});
-
-//获取指定窗口的所有子窗口id数组--获取browserWindowId窗口的子窗口id组成数组
-ipcMain.handle('getChildWindowsId', async (event, browserWindowId) => {
-  const thisBw = browserWindowId ? BrowserWindow.fromId(browserWindowId) : null;
-  const result = thisBw && thisBw.getChildWindows().map(i => i.id);
-  return result || [];
 });
 
 //创建新窗口
@@ -267,7 +189,7 @@ const doCreateNewWindow = async ({
       });
     }
   }
-  if (IS_DEV) xWindow.webContents.openDevTools();
+  // if (IS_DEV) xWindow.webContents.openDevTools();
   initData && xWindow.webContents.send('initData', initData); //自定义初始化参数
   console.log('准备打开窗口的id', xWindow.id);
   return xWindow.id;
@@ -278,3 +200,4 @@ const doCreateNewWindow = async ({
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+onEvent();

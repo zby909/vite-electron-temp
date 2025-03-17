@@ -12,7 +12,7 @@
     "typecheck:web": "vue-tsc --noEmit -p tsconfig.web.json --composite false",
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "start": "electron-vite preview",
-    "dev": "electron-vite dev --mode development",
+    "dev": "electron-vite dev --mode development --watch",
     "build:prod": "npm run typecheck && electron-vite build --mode production",
     "build:beta": "npm run typecheck && electron-vite build --mode beta",
     "postinstall": "electron-builder install-app-deps",
@@ -25,7 +25,8 @@
     "@electron-toolkit/preload": "^2.0.0",
     "@electron-toolkit/utils": "^2.0.0",
     "electron-store": "^8.1.0",
-    "electron-updater": "^6.1.1"
+    "electron-updater": "^6.1.1",
+    "puppeteer": "^19.0.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^1.0.1",

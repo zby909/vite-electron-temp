@@ -1,47 +1,40 @@
-<!--
- * @Description:
- * @Author: zby
- * @Date: 2024-01-15 15:53:30
- * @LastEditors: zby
- * @Reference:
--->
 <template>
   <div>
     <button @click="showTargetUrl">showTargetUrl</button>
-    <button @click="search">search</button>
+    <button @click="search">使用简单注入js</button>
+    <button @click="searchByCdp">使用cdp协议操作</button>
+    <button @click="showPuppeteerWin">showPuppetWin</button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
-import { useAppStore } from '@/stores/modules/app';
+import showTargetUrl from '@/hooks/openTargetWebSite';
+import showPuppeteerWin from '@/hooks/openPuppeteerWebSite';
 import { useWinStore } from '@/stores/modules/win';
 
-const appStore = useAppStore();
 const winStore = useWinStore();
-const { thisBrowserId } = storeToRefs(appStore);
 
-const showTargetUrl = async () => {
-  const winId = await window.electronAPI.ipcRenderer.invoke('createNewWindow', {
-    browserWindowOpt: { parentWinId: thisBrowserId.value, minWidth: 0, minHeight: 0 },
-    outUrl: 'https://baidu.com',
-  });
-  winStore.UPDATA_TARGETWINID(winId);
-  console.log(winId);
-};
-
+/* 假设网页已成功加载，直接输入并搜索 */
 const search = async () => {
   const res = await window.electronAPI.ipcRenderer.invoke('doExecuteJavaScript', {
     browserWindowId: winStore.targetWinId,
     script: `
     (function(){
-      const input = document.querySelector('#kw');
-      input.value = '掘金';
-      input.dispatchEvent(new Event('input')); // maybe need
-      const btn = document.querySelector('#su');
+      const input = document.querySelector('input[type="search"]');
+      input.value = 'juejin';
+      // 在操作一些使用框架的网站时，因为框架的事件监听机制，直接修改value不会触发事件，需要手动触发
+      input.dispatchEvent(new Event('input'));
+      const btn = document.querySelector('.seach-icon-container');
       btn.click();
     })()
   `,
+  });
+  console.log(res);
+};
+
+const searchByCdp = async () => {
+  const res = await window.electronAPI.ipcRenderer.invoke('cdpTest', {
+    browserWindowId: winStore.targetWinId,
   });
   console.log(res);
 };

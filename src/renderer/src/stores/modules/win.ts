@@ -13,10 +13,14 @@ export const useWinStore = defineStore({
   id: 'win',
   state: () => ({
     targetWinId: '',
+    adminWinId: '',
   }),
   actions: {
     UPDATA_TARGETWINID(val) {
       this.targetWinId = val;
+    },
+    UPDATA_ADMINWINID(val) {
+      this.adminWinId = val;
     },
   },
 });
