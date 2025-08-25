@@ -16,8 +16,6 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 
 const alias = {
   '@': resolve('src/renderer/src'),
-  '~': resolve('typings'),
-  '~renderer': resolve('src/renderer/typings'),
 };
 
 export default defineConfig({
