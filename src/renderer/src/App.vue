@@ -33,4 +33,4 @@ onBeforeMount(async () => {
 });
 </script>
 
-<style lang="scss"></style>
+<style></style>

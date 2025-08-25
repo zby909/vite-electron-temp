@@ -5,8 +5,8 @@
  * @LastEditors: zby
  * @Reference:
  */
-import 'normalize.css';
-import '@/styles/index.scss';
+import '@/styles/tailwind.css';
+import '@/styles/global.css';
 import '@/styles/font/iconfont.css';
 import '@/styles/font/iconfont.js';
 

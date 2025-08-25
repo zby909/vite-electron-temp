@@ -105,8 +105,4 @@ onMounted(() => {
 });
 </script>
 
-<style scoped lang="scss"></style>
-
-<style lang="scss">
-@import '../../styles/styles.scss';
-</style>
+<style scoped></style>

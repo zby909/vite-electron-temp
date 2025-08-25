@@ -14,7 +14,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   name: 'Empty',
   props: {
@@ -30,7 +30,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .empty {
   display: flex;
   flex-direction: column;
@@ -38,23 +38,20 @@ export default {
   justify-content: center;
   box-sizing: border-box;
   padding: 72px 0;
-
-  &__image {
-    width: 280px;
-    height: 280px;
-
-    img {
-      width: 100%;
-      height: 100%;
-    }
-  }
-
-  &__description {
-    margin-top: 16px;
-    padding: 0 60px;
-    color: #969799;
-    font-size: 16px;
-    line-height: 20px;
-  }
+}
+.empty__image {
+  width: 280px;
+  height: 280px;
+}
+.empty__image img {
+  width: 100%;
+  height: 100%;
+}
+.empty__description {
+  margin-top: 16px;
+  padding: 0 60px;
+  color: #969799;
+  font-size: 16px;
+  line-height: 20px;
 }
 </style>

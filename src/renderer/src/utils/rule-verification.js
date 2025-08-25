@@ -181,6 +181,7 @@ function jsonString(value) {
         return true;
       }
       return false;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       return false;
     }

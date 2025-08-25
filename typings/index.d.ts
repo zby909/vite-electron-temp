@@ -7,6 +7,7 @@
  */
 import { ElectronAPI } from '@electron-toolkit/preload';
 import { ChildProcess } from 'child_process';
+import type { UserInfo } from 'os';
 
 declare global {
   interface Window {
@@ -24,7 +25,7 @@ declare global {
 
 interface ElectronNodeAPI {
   processArgv: string[];
-  osUserInfo: string[];
+  osUserInfo: UserInfo<string>;
 }
 
 export interface RecordRuningServer {

@@ -6,7 +6,7 @@
  * @Reference:
  */
 
-const fs = require('fs');
+import fs from 'fs';
 
 function isDirEmpty(dirname) {
   const files = fs.readdirSync(dirname);

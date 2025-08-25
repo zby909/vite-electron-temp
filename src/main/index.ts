@@ -10,16 +10,16 @@ import type { WebPreferences } from 'electron';
 import { app, shell, BrowserWindow, dialog, ipcMain } from 'electron';
 import { optimizer, is } from '@electron-toolkit/utils';
 // import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
-const path = require('path');
-const Store = require('electron-store');
+import path from 'path';
+import Store from 'electron-store';
 const store = new Store();
 import icon from '../../resources/icon.png?asset';
-import generateUUID from '@/utils/guid.js';
+import generateUUID from './utils/guid.js';
 import { tryUsePort } from './utils/generate-port';
 const IS_DEV = ['development'].includes(import.meta.env.MODE);
 // console.log(import.meta.env);
 
-const setUniqueness = () => {
+const setUniqueness = (): void => {
   const IS_PROD = ['production'].includes(import.meta.env.MODE);
   const IS_BETA = ['beta'].includes(import.meta.env.MODE);
   const appName = `${IS_PROD ? 'janus-xxx' : IS_BETA ? 'janus-xxx-beta' : 'janus-xxx-test'}`;
@@ -37,12 +37,12 @@ if (!gotTheLock) {
     const thisEnvParamArr = additionalData.slice(1); //当前要启动的后端环境命令参数
     const port = await tryUsePort(); //获取可用端口
     // startServerExe(port, thisEnvParamArr);//如果有本地打包好的后端服务请打开该行代码，自行编写启动代码如使用execFile启动exe
-    createWindow(port, thisEnvParamArr); //为加快应用启动速度-直接启动窗口 在主页面判断后端服务是否连接成功
+    createWindow(String(port), thisEnvParamArr); //为加快应用启动速度-直接启动窗口 在主页面判断后端服务是否连接成功
   });
 }
 
 //创建新的主窗口
-async function createWindow(serverPort = '', envParamArr: Array<string> = []) {
+async function createWindow(serverPort = '', envParamArr: Array<string> = []): Promise<number> {
   const options = {
     browserWindowOpt: {
       // titleBarStyle: 'hidden',
@@ -74,7 +74,7 @@ app.whenReady().then(async () => {
     const port = await tryUsePort(); //获取可用端口
     const envParamArr = process.argv.slice(1); //快捷方式传入的参数
     // startServerExe(port, envParamArr); //启动本地服务器(如果需要启动本地服务器请打开该行代码，编写启动本地服务器的代码)
-    createWindow(port, envParamArr);
+    createWindow(String(port), envParamArr);
   } else {
     createWindow();
     // Install Vue Devtools
@@ -174,7 +174,14 @@ ipcMain.handle('createNewWindow', async (event, opt) => {
  * @param {*} initData - 初始化数据 用ipcRenderer接收
  * @param {Number} serverPort - 该窗口的服务器使用的端口
  */
-const doCreateNewWindow = async ({ browserWindowOpt, webPreferences = {}, windowId, hashRoute = '', serverPort, initData }: any = {}) => {
+const doCreateNewWindow = async ({
+  browserWindowOpt,
+  webPreferences = {},
+  windowId,
+  hashRoute = '',
+  serverPort,
+  initData,
+}: any = {}): Promise<number> => {
   //如果是希望创建子窗口，需具有parentWinId属性说明是想基于哪个窗口创建子窗口
   if (browserWindowOpt.parentWinId && browserWindowOpt.parentWinId !== -1) {
     browserWindowOpt.parent = BrowserWindow.fromId(Number(browserWindowOpt.parentWinId));

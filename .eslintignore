@@ -1,7 +1,0 @@
-node_modules
-resources/tfl_server
-.history
-dist
-out.
-src/renderer/src/styles/font
-.gitignore

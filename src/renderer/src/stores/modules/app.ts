@@ -22,8 +22,7 @@ interface State {
   language: string;
 }
 
-export const useAppStore = defineStore({
-  id: 'app',
+export const useAppStore = defineStore('app', {
   state: (): State => ({
     /* 初始化应用时需要刷新时保存持久化的参数 */
     isMainWin: true, //是否是主窗口

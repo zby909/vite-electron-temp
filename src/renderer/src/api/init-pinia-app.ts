@@ -9,7 +9,7 @@
 import { useAppStore } from '@/stores/modules/app';
 import { getParamFormUrl } from '@/api/get-param-fromurl';
 
-export const initAppStore = () => {
+export const initAppStore = (): void => {
   const { oldVuex, windowId, serverPort, thisBrowserId, parentWinId, appVersion, baseServiceUrl, isMainWin } = getParamFormUrl();
   //如果本地存储中没有appVersion，说明是第一次打开，需要手动写入pinia;
   //如果本地存储中有appVersion，说明不是第一次打开，这时候pinia持久化插件会自动将本地存储的值写入pinia,不需要手动写入

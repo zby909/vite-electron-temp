@@ -9,6 +9,7 @@ import { resolve } from 'path';
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite';
 import vue from '@vitejs/plugin-vue';
 import { visualizer } from 'rollup-plugin-visualizer';
+import tailwind from '@tailwindcss/vite';
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
@@ -50,6 +51,8 @@ export default defineConfig({
     },
     plugins: [
       vue(),
+      // Tailwind CSS v4 plugin to enable @import "tailwindcss" in CSS
+      tailwind(),
       AutoImport({
         imports: ['vue'],
         resolvers: [ElementPlusResolver()],
@@ -63,14 +66,7 @@ export default defineConfig({
         filename: 'test.html', //分析图生成的文件名
       }),
     ],
-    css: {
-      // css预处理器
-      preprocessorOptions: {
-        scss: {
-          additionalData: '@import "@/styles/variables.scss";',
-        },
-      },
-    },
+    // Remove SCSS preprocessor options since we no longer use Sass
     build: {
       sourcemap: true,
       rollupOptions: {

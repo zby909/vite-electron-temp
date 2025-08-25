@@ -6,7 +6,7 @@
  * @Reference: 使用时间戳作为seed基数 生成指定范围内的随机端口号并递归判断该生成的端口号是否可用
  */
 
-const { exec } = require('child_process');
+import { exec } from 'child_process';
 
 //getRandomNum: https://www.cnblogs.com/lhj2015/p/5122970.html
 function getRandomNum(Min = 4000, Max = 65535, seed = +new Date()) {

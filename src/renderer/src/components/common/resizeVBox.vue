@@ -19,7 +19,7 @@
     </div>
   </div>
 </template>
-<script>
+<script lang="ts">
 export default {
   name: 'ResizeVBox',
   components: {},
@@ -48,7 +48,7 @@ export default {
   methods: {},
 };
 </script>
-<style lang="scss" scoped>
+<style scoped>
 .gl__resize_box {
   display: flex;
   flex-direction: column;

@@ -7,11 +7,12 @@
  */
 import { contextBridge } from 'electron';
 import { electronAPI } from '@electron-toolkit/preload';
+import * as os from 'os';
 
 // Custom APIs for renderer
 const electronNodeAPI = {
   processArgv: process.argv,
-  osUserInfo: require('os').userInfo(),
+  osUserInfo: os.userInfo(),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to

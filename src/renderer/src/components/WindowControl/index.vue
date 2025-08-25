@@ -13,7 +13,7 @@
     <i :title="$t('Lang_commonVariables.close')" class="vxe-icon-close" @click="toClose"></i>
   </div>
 </template>
-<script>
+<script lang="ts">
 import { mapState } from 'pinia';
 import { useAppStore } from '@/stores/modules/app';
 export default {
@@ -56,20 +56,20 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
+<style scoped>
 .page_control {
   display: flex;
   align-items: center;
-  i {
-    font-size: 16px;
-    color: $mainTextColor2;
-    cursor: pointer;
-    &:hover {
-      color: $mainTextColor;
-    }
-  }
-  i + i {
-    margin-left: 20px;
-  }
+}
+.page_control i {
+  font-size: 16px;
+  color: #909399;
+  cursor: pointer;
+}
+.page_control i:hover {
+  color: #303133;
+}
+.page_control i + i {
+  margin-left: 20px;
 }
 </style>

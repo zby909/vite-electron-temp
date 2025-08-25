@@ -20,7 +20,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   name: 'GLBgIcon',
   props: {
@@ -34,7 +34,7 @@ export default {
     },
     size: {
       type: String,
-      validator(value) {
+      validator(value: string) {
         return ['contain', 'cover'].includes(value);
       },
       default: 'contain',
@@ -77,28 +77,25 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .gl-bgicon {
   display: inline-block;
   width: var(--bgwidth);
   height: var(--bgheight);
-
-  .gl-bgicon__bg {
-    display: block;
-    width: 100%;
-    height: 100%;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-image: var(--bgImg);
-
-    &.cover {
-      background-size: cover;
-    }
-
-    &.hover:hover {
-      background-image: var(--hoverBgImg);
-    }
-  }
+}
+.gl-bgicon .gl-bgicon__bg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: var(--bgImg);
+}
+.gl-bgicon .gl-bgicon__bg.cover {
+  background-size: cover;
+}
+.gl-bgicon .gl-bgicon__bg.hover:hover {
+  background-image: var(--hoverBgImg);
 }
 </style>

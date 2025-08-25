@@ -19,7 +19,7 @@
     </div>
   </div>
 </template>
-<script>
+<script lang="ts">
 export default {
   name: 'ResizeBox2',
   components: {},
@@ -52,7 +52,7 @@ export default {
   methods: {},
 };
 </script>
-<style lang="scss" scoped>
+<style scoped>
 .gl__resize_box {
   display: flex;
   height: 100%;
@@ -89,7 +89,7 @@ export default {
       bottom: 0;
       left: 0;
       right: 5px;
-      overflow: hidden; //解决收起时元素溢出问题
+      overflow: hidden;
     }
   }
   .right {

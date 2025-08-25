@@ -8,7 +8,5 @@
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "i18n-ally.localesPaths": [
-    "src/renderer/src/lang"
-  ]
+  "i18n-ally.localesPaths": ["src/renderer/src/lang"]
 }

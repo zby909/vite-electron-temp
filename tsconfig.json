@@ -13,13 +13,12 @@
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
+    "isolatedModules": true,
     "useUnknownInCatchVariables": false,
     "outDir": "./out",
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/renderer/src/*"], // 路径别名
-      "~/*": ["typings/*"],
-      "~renderer/*": ["src/renderer/typings/*"]
     }
   },
   "exclude": ["node_modules", "dist"], // 需要排除的文件夹

@@ -8,7 +8,7 @@
 
 <template>
   <ul class="versions">
-    <li class="electron-version">Electron v{{ versions.electron }}</li>
+    <li class="electron-version text-blue-300">Electron v{{ versions.electron }}</li>
     <li class="chrome-version">Chromium v{{ versions.chrome }}</li>
     <li class="node-version">Node v{{ versions.node }}</li>
     <li class="v8-version">V8 v{{ versions.v8 }}</li>
